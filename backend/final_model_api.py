@@ -43,7 +43,7 @@ torch.set_flush_denormal(True)
 model.load_state_dict(torch.load(tensor_path, map_location=torch.device('cpu')))
 model.eval()
 
-version = "0.9"
+version = "0.91"
 
 def run_model(inputs):
     """
@@ -235,6 +235,8 @@ def run_api(img, crop=True, landmarks=False):
         face_results[i]['locations'] = face_locs[i]
         face_results[i]['class'] = classes[pred[i]]
         face_results[i]['details'] = tuple(result[i].tolist())
+        face_results[i]['confidence'] = 100 * float(result[i][pred[i]])
+
     output = {
         'model_version': version,
         'count': len(faces),
@@ -247,7 +249,7 @@ def run_api(img, crop=True, landmarks=False):
 if __name__ == "__main__":
     import wget
     print("Test started")
-    url = 'https://images.unsplash.com/photo-1542619148-0f4e9f8de92e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80'
+    url = 'https://images.unsplash.com/photo-1583606784123-7c244f00d29c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80'
     filename = wget.download(url, out='pic.jpg')
     img = io.imread(filename)
     print()
