@@ -10,7 +10,6 @@ from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
 cors = CORS(app)
-
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 imagenet_class_index = json.load(open('./imagenet_class_index.json'))
@@ -34,6 +33,8 @@ def get_prediction(image_bytes):
     predicted_idx = str(y_hat.item())
     return imagenet_class_index[predicted_idx]
 
+
+
 @app.route('/', methods=['GET'])
 # @cross_origin()
 def main():
@@ -50,18 +51,10 @@ def predict():
     if request.method == 'GET':
         return jsonify({'test': get})
 
-@app.route('/test', methods=['GET'])
-def test_endpoint():
-    if request.method == 'GET':
-        return jsonify({'/test': 'hiii'})
-
-@app.route("/api/v2/test_response")
-def users():
-    headers = {"Content-Type": "application/json"}
-    return make_response('Test worked!',
-                         200,
-                         headers=headers)
-
+# @app.route('/test', methods=['GET'])
+# def test_endpoint():
+#     if request.method == 'GET':
+#         return jsonify({'/test': 'hiii'})
 
 if __name__ == '__main__':
     app.run(debug=True)

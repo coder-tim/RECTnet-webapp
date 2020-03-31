@@ -1,13 +1,19 @@
 import React from 'react';
 import axios from 'axios';
 
+import { makeStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+// import PhotoCamera from '@material-ui/icons/PhotoCamera';
+
 class Main extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
       selectedFile: '',
-      imagePreviewUrl: null
+      imagePreviewUrl: null,
+      modelPredictionText: ''
     };
   }
 
@@ -33,43 +39,61 @@ class Main extends React.Component {
 
   fileUploadHandler = (event) => {
      
+    if (this.state.selectedFile != '') {
       const fd = new FormData();
       fd.append('file',  this.state.selectedFile);
 
        fetch (
-        'http://localhost:5000/predict', {
+        '/predict', {
             method: 'POST',
             body: fd
         })
         .then(res => res.json())
-        .then(result => console.log(result))
-
-
-        // for testing
-        // fetch (
-        //   'http://localhost:5000/test', {
-        //   })
-        //   .then(res => res.json())
-        //   .then(result => console.log(result))
-
+        .then(result => this.setState({modelPredictionText: result.class_name}))       
+      }
   }
 
   render() {
     let imageStyle = {
-        height: 200,
-        width: 300,
-        marginTop: 100
+        height: 300,
+        width: 450,
+        marginTop: 50
     }
+
+    const useStyles = makeStyles((theme) => ({
+      root: {
+        '& > *': {
+          margin: theme.spacing(1),
+        },
+      },
+      input: {
+        display: 'none',
+      },
+    }));
 
     return (
         <div className="Main">
-            <h1>RECTnet</h1>
+            <p style={{fontFamily: 'sans-serif', fontSize: 45}}>RECTnet</p>
+
             <div>
-                <input type="file" onChange={this.fileSelectedHandler}/>
-                <button onClick={this.fileUploadHandler}>Upload</button>
+
+             <Button variant="contained" color="primary" component="label" style={{marginRight:30}}>
+                Upload
+                <input type="file" onChange={this.fileSelectedHandler} style={{ display: "none" }}/>
+              </Button>
+
+                {/* <input type="file" onChange={this.fileSelectedHandler}/> */}
+  
+              <Button onClick={this.fileUploadHandler} variant="contained" color="primary" component="span">
+                Predict
+              </Button>
             </div>
+
             <div>
                  <img src={this.state.imagePreviewUrl} style={{...imageStyle}} />
+            </div>
+            <div>
+                <p style={{fontSize: 28}}>Predicted result:    {this.state.modelPredictionText}</p>
             </div>
         </div>
     );
