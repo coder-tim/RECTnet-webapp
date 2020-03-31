@@ -222,6 +222,14 @@ def run_api(img, crop=True, landmarks=False):
     for face in faces:
         inputs.append(transform(face))
 
+    if len(inputs) == 0:
+        return ({
+            'model_version': version,
+            'count': len(faces),
+            'time': time() - s_time,
+            'faces': []
+        })
+
     inputs = torch.stack(inputs)
 
     result = run_model(inputs)
@@ -249,7 +257,7 @@ def run_api(img, crop=True, landmarks=False):
 if __name__ == "__main__":
     import wget
     print("Test started")
-    url = 'https://images.unsplash.com/photo-1583606784123-7c244f00d29c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80'
+    url = 'https://images.unsplash.com/photo-1523422914648-23a7478946cb?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1385&q=80'
     filename = wget.download(url, out='pic.jpg')
     img = io.imread(filename)
     print()
