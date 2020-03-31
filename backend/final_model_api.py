@@ -211,7 +211,7 @@ def run_api(img, crop=True, landmarks=False):
     s_time = time()
     
     if crop:
-        faces, face_locs = get_faces(img, debug=True)
+        faces, face_locs = get_faces(img)
         faces = np.array(faces)
     else:
         faces = [img]
@@ -221,18 +221,14 @@ def run_api(img, crop=True, landmarks=False):
     inputs = []
     for face in faces:
         inputs.append(transform(face))
-        print(face.shape)
-        print(inputs[-1].shape)
 
     inputs = torch.stack(inputs)
 
     result = run_model(inputs)
     pred = result.max(1, keepdim=True)[1]
-    for i, p in enumerate(pred):
-        print('Result: {}, confidence: {:5.2f}%'.format(classes[p], 100 * float(result[i][p])))
+    # for i, p in enumerate(pred):
+    #     print('Result: {}, confidence: {:5.2f}%'.format(classes[p], 100 * float(result[i][p])))
 
-    print("Time spent:", time() - s_time)
-    
     face_results = []
     for i, f in enumerate(faces):
         face_results.append({})
@@ -251,7 +247,8 @@ def run_api(img, crop=True, landmarks=False):
 if __name__ == "__main__":
     import wget
     print("Test started")
-    url = 'https://www.paintbrushfire.org/wp-content/uploads/audrey-hepburn.jpg'
+    url = 'https://images.unsplash.com/photo-1542619148-0f4e9f8de92e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80'
     filename = wget.download(url, out='pic.jpg')
     img = io.imread(filename)
+    print()
     pprint(run_api(img))
