@@ -30,16 +30,21 @@ class Main extends React.Component {
     this.state = {
       selectedFile: '',
       imagePreviewUrl: null,
-      modelPredictionText: ''
+      modelPredictionText: '',
+      pictures: []
     };
+
+    this.onDrop = this.onDrop.bind(this);
+  }
+
+
+  onDrop(pictureFiles, pictureDataURLs) {
+    this.setState({
+      pictures: this.state.pictures.concat(pictureFiles)
+    });
   }
 
   fileSelectedHandler = event => {
-    // console.log(event.target.files[0]);
-    //   this.setState({
-    //       selectedFile: event.target.files[0]
-    //   })
-
     event.preventDefault();
     let reader = new FileReader();
     let file = event.target.files[0]
@@ -50,13 +55,13 @@ class Main extends React.Component {
             imagePreviewUrl: reader.result
         })
     }
-
     reader.readAsDataURL(file);
   }
 
-  fileUploadHandler = (event) => {
+  predictHandler = (event) => {
      
-    if (this.state.selectedFile != '') {
+    // if (this.state.pictures.length !== 0) {
+      if (this.state.selectedFile !== '') {
       const fd = new FormData();
       fd.append('file',  this.state.selectedFile);
 
@@ -64,9 +69,16 @@ class Main extends React.Component {
         '/predict', {
             method: 'POST',
             body: fd
+            // body: this.state.pictures[0]
         })
-        .then(res => res.json())
-        .then(result => this.setState({modelPredictionText: result.class_name}))       
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          console.log(data);
+        });
+      
+        // .then(result => this.setState({modelPredictionText: result.class_name}))       
       }
   }
 
@@ -92,21 +104,23 @@ class Main extends React.Component {
 
     return (
         <div className="Main">
-            {/* <p style={{fontFamily: 'sans-serif', fontSize: 45}}>RECTnet</p> */}
 
-            <div>
-
-             <Button variant="contained" color="primary" component="label" style={{marginRight:30}}>
+            <p style={{fontFamily: 'sans-serif', fontSize: 45, color: '#696969'}}>RECTnet</p>
+            <div> 
+              <Button variant="contained" color="primary" component="label" style={{marginRight:30}}>
                 Upload
                 <input type="file" onChange={this.fileSelectedHandler} style={{ display: "none" }}/>
-              </Button>
+              </Button> 
 
-                {/* <input type="file" onChange={this.fileSelectedHandler}/> */}
-  
-              <Button onClick={this.fileUploadHandler} variant="contained" color="primary" component="span">
+              <Button onClick={this.predictHandler} variant="contained" color="primary" component="span">
                 Predict
               </Button>
+             </div> 
+
+             <div>
+                <p style={{fontFamily: 'sans-serif', fontSize: 20, color: '#696969'}}>Predicted result:    {this.state.modelPredictionText}</p>
             </div>
+
             {
               this.state.selectedFile === '' || 
               <Container maxWidth="lg">

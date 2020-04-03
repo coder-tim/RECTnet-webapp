@@ -1,42 +1,22 @@
+import cv2
 import io
 import json
+import requests
 
 from torchvision import models
 import torchvision.transforms as transforms
 from PIL import Image
 from flask import Flask, jsonify, request, make_response
-import requests
 from flask_cors import CORS, cross_origin
+from final_model_api import run_api
+import numpy as np
+
 
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-imagenet_class_index = json.load(open('./imagenet_class_index.json'))
-model = models.densenet121(pretrained=True)
-model.eval()
-
-def transform_image(image_bytes):
-    my_transforms = transforms.Compose([transforms.Resize(255),
-                                        transforms.CenterCrop(224),
-                                        transforms.ToTensor(),
-                                        transforms.Normalize(
-                                            [0.485, 0.456, 0.406],
-                                            [0.229, 0.224, 0.225])])
-    image = Image.open(io.BytesIO(image_bytes))
-    return my_transforms(image).unsqueeze(0)
-
-def get_prediction(image_bytes):
-    tensor = transform_image(image_bytes=image_bytes)
-    outputs = model.forward(tensor)
-    _, y_hat = outputs.max(1)
-    predicted_idx = str(y_hat.item())
-    return imagenet_class_index[predicted_idx]
-
-
-
 @app.route('/', methods=['GET'])
-# @cross_origin()
 def main():
     return jsonify({'classsfds_id': 'hiii'})
 
@@ -44,21 +24,20 @@ def main():
 @app.route('/predict', methods=['GET', 'POST'])
 def predict():
     if request.method == 'POST':
-        file = request.files['file']
-        img_bytes = file.read() # set name to 'file'
-        class_id, class_name = get_prediction(image_bytes=img_bytes)
-        return jsonify({'class_id': class_id, 'class_name': class_name})
-    if request.method == 'GET':
-        return jsonify({'test': get})
+        file = request.files['file'].read()
+        np_img = np.fromstring(file, np.uint8) # convert to numpy array
+        img = cv2.imdecode(np_img, cv2.IMREAD_UNCHANGED) # convert numpy array to image
+        result = run_api(img) # run image through our own model
+        return jsonify(str(result))
 
-# @app.route('/test', methods=['GET'])
-# def test_endpoint():
-#     if request.method == 'GET':
-#         return jsonify({'/test': 'hiii'})
+    return '''
+    <!doctype html>
+    <title>Upload new image</title>
+    <h1>This URI is used for uploading images</h1>
+    '''
 
 if __name__ == '__main__':
     app.run(debug=True)
-    # resp = requests.post("http://localhost:5000/predict", files={"file": open('./cat.jpeg','rb')})
 
 # $ export FLASK_APP=hello.py
 # $ python -m flask run
