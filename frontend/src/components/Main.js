@@ -31,17 +31,8 @@ class Main extends React.Component {
       selectedFile: '',
       imagePreviewUrl: null,
       modelPredictionText: '',
-      pictures: []
+      predictedResult: ''
     };
-
-    this.onDrop = this.onDrop.bind(this);
-  }
-
-
-  onDrop(pictureFiles, pictureDataURLs) {
-    this.setState({
-      pictures: this.state.pictures.concat(pictureFiles)
-    });
   }
 
   fileSelectedHandler = event => {
@@ -60,8 +51,7 @@ class Main extends React.Component {
 
   predictHandler = (event) => {
      
-    // if (this.state.pictures.length !== 0) {
-      if (this.state.selectedFile !== '') {
+    if (this.state.selectedFile !== '') {
       const fd = new FormData();
       fd.append('file',  this.state.selectedFile);
 
@@ -69,17 +59,18 @@ class Main extends React.Component {
         '/predict', {
             method: 'POST',
             body: fd
-            // body: this.state.pictures[0]
         })
         .then((response) => {
           return response.json();
         })
         .then((data) => {
-          console.log(data);
-        });
-      
-        // .then(result => this.setState({modelPredictionText: result.class_name}))       
-      }
+          data = data.split('(').join('[');
+          data = data.split(')').join(']');
+          data = data.replace(/\'/g, '\"');
+          let result = JSON.parse(data);
+          this.setState({predictedResult: result})
+        });      
+    }
   }
 
   render() {
@@ -106,19 +97,7 @@ class Main extends React.Component {
         <div className="Main">
 
             <p style={{fontFamily: 'sans-serif', fontSize: 45, color: '#696969'}}>RECTnet</p>
-            
-
-            {/* <ImageUploader
-              withIcon={true}
-              buttonText="Upload an image"
-              onChange={this.onDrop}
-              imgExtension={[".jpg", ".gif", ".png", ".gif"]}
-              maxFileSize={5242880}
-              withPreview={true}
-              label={""}
-              singleImage={true}
-            /> */}
-
+        
             <div> 
 
               <Button variant="contained" color="primary" component="label" style={{marginRight:30}}>
@@ -131,9 +110,14 @@ class Main extends React.Component {
               </Button>
              </div> 
 
-
              <div>
-                <p style={{fontFamily: 'sans-serif', fontSize: 20, color: '#696969'}}>Predicted result:    {this.state.modelPredictionText}</p>
+                <p style={{fontFamily: 'sans-serif', fontSize: 20, color: '#696969'}}>Prediction:   
+                {'   '}
+                {this.state.predictedResult 
+                  && this.state.predictedResult['faces']
+                  && this.state.predictedResult['faces'][0]
+                  && this.state.predictedResult['faces'][0]['class'].split(" ")[1]
+                }</p>
             </div>
 
              <div>

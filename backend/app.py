@@ -28,7 +28,8 @@ def predict():
         np_img = np.fromstring(file, np.uint8) # convert to numpy array
         img = cv2.imdecode(np_img, cv2.IMREAD_UNCHANGED) # convert numpy array to image
         result = run_api(img) # run image through our own model
-        return jsonify(str(result))
+        # return jsonify(str(result))
+        return json.dumps(str(result))
 
     return '''
     <!doctype html>
