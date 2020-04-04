@@ -22,7 +22,6 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 import { mainListItems, secondaryListItems } from './listItems';
 import Button from '@material-ui/core/Button';
 // import PhotoCamera from '@material-ui/icons/PhotoCamera';
-import ImageUploader from 'react-images-upload';
 
 class Main extends React.Component {
   constructor(props) {
