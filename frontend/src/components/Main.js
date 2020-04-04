@@ -21,7 +21,9 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import { mainListItems, secondaryListItems } from './listItems';
 import Button from '@material-ui/core/Button';
-// import PhotoCamera from '@material-ui/icons/PhotoCamera';
+import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
+import Loader from 'react-loader-spinner';
+
 
 class Main extends React.Component {
   constructor(props) {
@@ -30,8 +32,9 @@ class Main extends React.Component {
     this.state = {
       selectedFile: '',
       imagePreviewUrl: null,
-      modelPredictionText: '',
-      predictedResult: ''
+      // modelPredictionText: '',
+      predictedResult: '',
+      resultFinishedLoading: ''
     };
   }
 
@@ -51,24 +54,30 @@ class Main extends React.Component {
 
   predictHandler = (event) => {
      
+
     if (this.state.selectedFile !== '') {
+      this.setState({resultFinishedLoading: false}); 
+
       const fd = new FormData();
       fd.append('file',  this.state.selectedFile);
 
-       fetch (
-        '/predict', {
-            method: 'POST',
-            body: fd
-        })
-        .then((response) => {
-          return response.json();
-        })
-        .then((data) => {
-          data = data.split('(').join('[');
-          data = data.split(')').join(']');
-          data = data.replace(/\'/g, '\"');
-          let result = JSON.parse(data);
-          this.setState({predictedResult: result})
+      fetch (
+      '/predict', {
+          method: 'POST',
+          body: fd
+      })
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        data = data.split('(').join('[');
+        data = data.split(')').join(']');
+        data = data.replace(/\'/g, '\"');
+        let result = JSON.parse(data);
+
+        this.setState({
+          predictedResult: result,
+          resultFinishedLoading: true})
         });      
     }
   }
@@ -93,6 +102,32 @@ class Main extends React.Component {
 
     console.log('selectedFile' + this.state.selectedFile)
 
+
+    // Display the prediction result
+    // If it hasn't finished loading yet, display the spinner
+    let predictionResult;
+
+    if (this.state.resultFinishedLoading === true) {
+      predictionResult = <div>
+                            <p style={{fontFamily: 'sans-serif', fontSize: 20, color: '#696969'}}>Prediction:   
+                            {'   '}
+                            {this.state.predictedResult 
+                              && this.state.predictedResult['faces']
+                              && this.state.predictedResult['faces'][0]
+                              && this.state.predictedResult['faces'][0]['class'].split(" ")[1]
+                            }</p>
+                      </div>;
+    } else if (this.state.resultFinishedLoading === false) {
+      predictionResult = <Loader
+                          type="Rings"
+                          color="#3f51b5"
+                          height={150}
+                          width={150}
+                          />;
+    } else {
+      predictionResult = '';
+    }
+
     return (
         <div className="Main">
 
@@ -110,15 +145,7 @@ class Main extends React.Component {
               </Button>
              </div> 
 
-             <div>
-                <p style={{fontFamily: 'sans-serif', fontSize: 20, color: '#696969'}}>Prediction:   
-                {'   '}
-                {this.state.predictedResult 
-                  && this.state.predictedResult['faces']
-                  && this.state.predictedResult['faces'][0]
-                  && this.state.predictedResult['faces'][0]['class'].split(" ")[1]
-                }</p>
-            </div>
+              {predictionResult}
 
              <div>
                  <img src={this.state.imagePreviewUrl} style={{...imageStyle}} />
