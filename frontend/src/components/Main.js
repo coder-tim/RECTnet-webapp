@@ -22,6 +22,7 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 import { mainListItems, secondaryListItems } from './listItems';
 import Button from '@material-ui/core/Button';
 // import PhotoCamera from '@material-ui/icons/PhotoCamera';
+import ImageUploader from 'react-images-upload';
 
 class Main extends React.Component {
   constructor(props) {
@@ -106,7 +107,21 @@ class Main extends React.Component {
         <div className="Main">
 
             <p style={{fontFamily: 'sans-serif', fontSize: 45, color: '#696969'}}>RECTnet</p>
+            
+
+            {/* <ImageUploader
+              withIcon={true}
+              buttonText="Upload an image"
+              onChange={this.onDrop}
+              imgExtension={[".jpg", ".gif", ".png", ".gif"]}
+              maxFileSize={5242880}
+              withPreview={true}
+              label={""}
+              singleImage={true}
+            /> */}
+
             <div> 
+
               <Button variant="contained" color="primary" component="label" style={{marginRight:30}}>
                 Upload
                 <input type="file" onChange={this.fileSelectedHandler} style={{ display: "none" }}/>
@@ -117,22 +132,14 @@ class Main extends React.Component {
               </Button>
              </div> 
 
+
              <div>
                 <p style={{fontFamily: 'sans-serif', fontSize: 20, color: '#696969'}}>Predicted result:    {this.state.modelPredictionText}</p>
             </div>
 
-            {
-              this.state.selectedFile === '' || 
-              <Container maxWidth="lg">
-                <div>
-                    <img src={this.state.imagePreviewUrl} style={{...imageStyle}} />
-                </div>
-                <div>
-                    <p style={{fontSize: 28}}>Predicted result:    {this.state.modelPredictionText}</p>
-                </div>
-              </Container>
-            }
-            
+             <div>
+                 <img src={this.state.imagePreviewUrl} style={{...imageStyle}} />
+            </div> 
         </div>
     );
   }
