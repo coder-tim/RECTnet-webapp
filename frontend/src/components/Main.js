@@ -24,7 +24,6 @@ import Button from '@material-ui/core/Button';
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import Loader from 'react-loader-spinner';
 
-
 class Main extends React.Component {
   constructor(props) {
     super(props);
@@ -52,9 +51,7 @@ class Main extends React.Component {
     reader.readAsDataURL(file);
   }
 
-  predictHandler = (event) => {
-     
-
+  predictHandler = (event) => {    
     if (this.state.selectedFile !== '') {
       this.setState({resultFinishedLoading: false}); 
 
@@ -100,9 +97,6 @@ class Main extends React.Component {
       },
     }));
 
-    console.log('selectedFile' + this.state.selectedFile)
-
-
     // Display the prediction result
     // If it hasn't finished loading yet, display the spinner
     let predictionResult;
@@ -116,7 +110,7 @@ class Main extends React.Component {
                               && this.state.predictedResult['faces'][0]
                               && this.state.predictedResult['faces'][0]['class'].split(" ")[1]
                             }</p>
-                      </div>;
+                          </div>;
     } else if (this.state.resultFinishedLoading === false) {
       predictionResult = <Loader
                           type="Rings"
@@ -130,23 +124,17 @@ class Main extends React.Component {
 
     return (
         <div className="Main">
-
             <p style={{fontFamily: 'sans-serif', fontSize: 45, color: '#696969'}}>RECTnet</p>
-        
             <div> 
-
               <Button variant="contained" color="primary" component="label" style={{marginRight:30}}>
                 Upload
                 <input type="file" onChange={this.fileSelectedHandler} style={{ display: "none" }}/>
               </Button> 
-
               <Button onClick={this.predictHandler} variant="contained" color="primary" component="span">
                 Predict
               </Button>
              </div> 
-
               {predictionResult}
-
              <div>
                  <img src={this.state.imagePreviewUrl} style={{...imageStyle}} />
             </div> 
