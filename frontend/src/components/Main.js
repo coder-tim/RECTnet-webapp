@@ -160,33 +160,33 @@ class Main extends React.Component {
           resultFinishedLoading: true
         })
 
-        if (this.state.predictedResult 
-              && this.state.predictedResult['faces']
-              // && this.state.predictedResult['faces'][0]
-              // && this.state.predictedResult['faces'][0]['class']
-              ) {
-          mood = this.state.predictedResult['faces'][0]['class'].split(" ")[1];
-          confidence = this.state.predictedResult['faces'][0]['confidence']; 
-          dataEntryToBeReplaced.name = mood;
-          dataEntryToBeReplaced.value = confidence;
-        }
+        // if (this.state.predictedResult 
+        //       && this.state.predictedResult['faces']
+        //       // && this.state.predictedResult['faces'][0]
+        //       // && this.state.predictedResult['faces'][0]['class']
+        //       ) {
+        //   mood = this.state.predictedResult['faces'][0]['class'].split(" ")[1];
+        //   confidence = this.state.predictedResult['faces'][0]['confidence']; 
+        //   dataEntryToBeReplaced.name = mood;
+        //   dataEntryToBeReplaced.value = confidence;
+        // }
         // console.log(mood);
         // console.log(confidence);
         // console.log(dataEntryToBeReplaced);
 
-        let dataCopy = this.state.data;
-        // console.log(dataCopy)
+        // let dataCopy = this.state.data;
+        // // console.log(dataCopy)
 
-        for (let i = 0; i <  dataCopy.length; i++) {
-          console.log(dataCopy[i].name, dataEntryToBeReplaced.name);
-          if (dataCopy[i].name == dataEntryToBeReplaced.name); {
-            console.log("true")
-            dataCopy[i].value = dataEntryToBeReplaced.value;
-          }          
-        }
+        // for (let i = 0; i <  dataCopy.length; i++) {
+        //   console.log(dataCopy[i].name, dataEntryToBeReplaced.name);
+        //   if (dataCopy[i].name == dataEntryToBeReplaced.name); {
+        //     console.log("true")
+        //     dataCopy[i].value = dataEntryToBeReplaced.value;
+        //   }          
+        // }
 
-        this.setState({data: dataCopy});
-        console.log(dataCopy);
+        // this.setState({data: dataCopy});
+        // console.log(dataCopy);
                               
         });      
     }
@@ -220,7 +220,7 @@ class Main extends React.Component {
     let pieChartComponent;
 
     if (this.state.resultFinishedLoading === true) {
-      predictionResult = <div>
+       predictionResult = <div>
                             <p style={{marginTop: 70 ,fontFamily: 'sans-serif', fontSize: 20, color: '#3f51b5'}}>Prediction:   
                             {'   '}
                             {this.state.predictedResult 
@@ -232,18 +232,19 @@ class Main extends React.Component {
        pieChartComponent = <PieChart width={730} height={250}>
                             {/* <Pie data={this.state.data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} fill="#8884d8" label/> */}
                             <Pie data={this.state.data} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={80} outerRadius={100} fill="#3f51b5" label />
-                            <h2>hi</h2>
+                            <h2 style={{marginLeft: 50}}>hi</h2>
                            </PieChart>
     } else if (this.state.resultFinishedLoading === false) {
-      predictionResult = <Loader
-                          type="Rings"
-                          color="#3f51b5"
-                          height={150}
-                          width={150}
-                          />;
-      pieChartComponent = null;
+        predictionResult = <Loader
+                            type="Rings"
+                            color="#3f51b5"
+                            height={150}
+                            width={150}
+                            />;
+        pieChartComponent = null;
     } else {
-      predictionResult = '';
+        predictionResult = '';
+        pieChartComponent = null;
     }
 
     return (
