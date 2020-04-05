@@ -24,7 +24,7 @@ import Button from '@material-ui/core/Button';
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import Loader from 'react-loader-spinner';
 import { PieChart, Pie, Sector } from 'recharts';
-
+import cloneDeep from 'lodash/cloneDeep';
 
 // Pie chart used to display predicted emotions
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
@@ -70,12 +70,11 @@ const renderActiveShape = (props) => {
       <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
       <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill="#333">{`${payload.name} ${value}`}</text>
       <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} dy={18} textAnchor={textAnchor} fill="#999">
-        {/* {`(Rate ${(percent * 100).toFixed(2)}%)`} */}
+        {`(Rate ${(percent * 100).toFixed(2)}%)`}
       </text>
     </g>
   );
 };
-
 
 class Main extends React.Component {
   static jsfiddleUrl = 'https://jsfiddle.net/alidingling/hqnrgxpj/';
@@ -106,8 +105,11 @@ class Main extends React.Component {
 
   // Used for pie chart
   componentDidMount() {
-    // const height = this.divElement.clientHeight;
-    // this.setState({ height });
+    const height = 400;
+    if (this.divElement && this.divElement.clientHeight) {
+      height = this.divElement.clientHeight;
+    }
+    this.setState({ height });
   }
 
   onPieEnter = (data, index) => {
@@ -115,7 +117,6 @@ class Main extends React.Component {
       activeIndex: index,
     });
   };
-
 
   fileSelectedHandler = event => {
     event.preventDefault();
@@ -160,33 +161,32 @@ class Main extends React.Component {
           resultFinishedLoading: true
         })
 
-        // if (this.state.predictedResult 
-        //       && this.state.predictedResult['faces']
-        //       // && this.state.predictedResult['faces'][0]
-        //       // && this.state.predictedResult['faces'][0]['class']
-        //       ) {
-        //   mood = this.state.predictedResult['faces'][0]['class'].split(" ")[1];
-        //   confidence = this.state.predictedResult['faces'][0]['confidence']; 
-        //   dataEntryToBeReplaced.name = mood;
-        //   dataEntryToBeReplaced.value = confidence;
-        // }
-        // console.log(mood);
-        // console.log(confidence);
-        // console.log(dataEntryToBeReplaced);
+        if (this.state.predictedResult 
+              && this.state.predictedResult['faces']
+              // && this.state.predictedResult['faces'][0]
+              // && this.state.predictedResult['faces'][0]['class']
+              ) {
+          mood = this.state.predictedResult['faces'][0]['class'].split(" ")[1];
+          confidence = this.state.predictedResult['faces'][0]['confidence']; 
+          confidence = confidence.toFixed(1);
+          dataEntryToBeReplaced.name = mood;
+          dataEntryToBeReplaced.value = Number(confidence);
+        }
+        console.log(mood);
+        console.log(confidence);
+        console.log(dataEntryToBeReplaced);
 
-        // let dataCopy = this.state.data;
-        // // console.log(dataCopy)
+        let dataCopy = cloneDeep(this.state.data);
 
-        // for (let i = 0; i <  dataCopy.length; i++) {
-        //   console.log(dataCopy[i].name, dataEntryToBeReplaced.name);
-        //   if (dataCopy[i].name == dataEntryToBeReplaced.name); {
-        //     console.log("true")
-        //     dataCopy[i].value = dataEntryToBeReplaced.value;
-        //   }          
-        // }
+        console.log(dataCopy);
+        for (let i = 0; i <  dataCopy.length; i++) {
+          if (dataCopy[i].name === mood) {
+            dataCopy[i] = dataEntryToBeReplaced;
+          }          
+        }
 
-        // this.setState({data: dataCopy});
-        // console.log(dataCopy);
+        console.log(dataCopy);
+        this.setState({data: dataCopy});
                               
         });      
     }
@@ -200,7 +200,8 @@ class Main extends React.Component {
         height: '20em',
         width: '30em',
         marginTop: 50,
-        marginLeft: 230
+        marginLeft: 130,
+
     }
 
     const useStyles = makeStyles((theme) => ({
@@ -229,11 +230,25 @@ class Main extends React.Component {
                               && this.state.predictedResult['faces'][0]['class'].split(" ")[1]
                             }</p>
                           </div>;
-       pieChartComponent = <PieChart width={730} height={250}>
-                            {/* <Pie data={this.state.data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} fill="#8884d8" label/> */}
-                            <Pie data={this.state.data} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={80} outerRadius={100} fill="#3f51b5" label />
-                            <h2 style={{marginLeft: 50}}>hi</h2>
-                           </PieChart>
+       pieChartComponent =   <div
+                                ref={ (divElement) => { this.divElement = divElement } }>
+                                    <PieChart width={800} height={400}>
+                                        <Pie
+                                            activeIndex={this.state.activeIndex}
+                                            activeShape={renderActiveShape}
+                                            data={this.state.data}
+                                            cx={dim/2 + 80}
+                                            cy={dim/2}
+                                            innerRadius={dim/6}
+                                            outerRadius={dim/5}
+                                            fill="#8884d8"
+                                            dataKey="value"
+                                            onMouseEnter={this.onPieEnter}
+                                        />
+                                    </PieChart>
+                                </div>
+
+
     } else if (this.state.resultFinishedLoading === false) {
         predictionResult = <Loader
                             type="Rings"
@@ -249,9 +264,7 @@ class Main extends React.Component {
 
     return (
         <div className="Main">
-          
             <p style={{fontFamily: 'sans-serif', fontSize: 45, color: '#696969'}}>RECTnet</p>
-
             <div> 
               <Button variant="contained" color="primary" component="label" style={{marginRight:30}}>
                 Upload
@@ -260,36 +273,14 @@ class Main extends React.Component {
               <Button onClick={this.predictHandler} variant="contained" color="primary" component="span">
                 Predict
               </Button>
-
-             </div> 
-              {predictionResult}
-
+            </div> 
+            {predictionResult}
             <Grid container spacing={1} >
               <Grid item xs={9} >
-                    <img src={this.state.imagePreviewUrl} style={{...imageStyle}} />
+                <img src={this.state.imagePreviewUrl} style={{...imageStyle}} />
               </Grid>
-                
               <Grid item xs={1}>
-                {/* <div
-                    ref={ (divElement) => { this.divElement = divElement } }>
-                      <PieChart width={dim} height={dim}>
-                          <Pie
-                              activeIndex={this.state.activeIndex}
-                              activeShape={renderActiveShape}
-                              data={this.state.data}
-                              cx={dim/2}
-                              cy={dim/2}
-                              innerRadius={dim/6}
-                              outerRadius={dim/5}
-                              fill="#8884d8"
-                              dataKey="value"
-                              onMouseEnter={this.onPieEnter}
-                          />
-                    </PieChart>
-                </div> */}
-
                 {pieChartComponent}
-
               </Grid>
             </Grid>
         </div>
