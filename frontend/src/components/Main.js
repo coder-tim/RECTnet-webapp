@@ -94,7 +94,7 @@ class Main extends React.Component {
       height: 400,
       data: [
         { name: 'Neutral',    value: 0.02 },
-        { name: 'Happiness',  value: 0.02 },
+        { name: 'Happiness',  value: 0.8 },
         { name: 'Sadness',    value: 0.02 },
         { name: 'Surprise',   value: 0.02 },
         { name: 'Fear',       value: 0.02 },
@@ -199,7 +199,8 @@ class Main extends React.Component {
     let imageStyle = {
         height: '20em',
         width: '30em',
-        marginTop: 50
+        marginTop: 50,
+        marginLeft: 230
     }
 
     const useStyles = makeStyles((theme) => ({
@@ -216,10 +217,11 @@ class Main extends React.Component {
     // Display the prediction result
     // If it hasn't finished loading yet, display the spinner
     let predictionResult;
+    let pieChartComponent;
 
     if (this.state.resultFinishedLoading === true) {
       predictionResult = <div>
-                            <p style={{fontFamily: 'sans-serif', fontSize: 20, color: '#696969'}}>Prediction:   
+                            <p style={{marginTop: 70 ,fontFamily: 'sans-serif', fontSize: 20, color: '#3f51b5'}}>Prediction:   
                             {'   '}
                             {this.state.predictedResult 
                               && this.state.predictedResult['faces']
@@ -227,6 +229,11 @@ class Main extends React.Component {
                               && this.state.predictedResult['faces'][0]['class'].split(" ")[1]
                             }</p>
                           </div>;
+       pieChartComponent = <PieChart width={730} height={250}>
+                            {/* <Pie data={this.state.data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} fill="#8884d8" label/> */}
+                            <Pie data={this.state.data} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={80} outerRadius={100} fill="#3f51b5" label />
+                            <h2>hi</h2>
+                           </PieChart>
     } else if (this.state.resultFinishedLoading === false) {
       predictionResult = <Loader
                           type="Rings"
@@ -234,6 +241,7 @@ class Main extends React.Component {
                           height={150}
                           width={150}
                           />;
+      pieChartComponent = null;
     } else {
       predictionResult = '';
     }
@@ -255,13 +263,13 @@ class Main extends React.Component {
              </div> 
               {predictionResult}
 
-            {/* <Grid container spacing={1} >
-              <Grid item xs={9} > */}
+            <Grid container spacing={1} >
+              <Grid item xs={9} >
                     <img src={this.state.imagePreviewUrl} style={{...imageStyle}} />
-              {/* </Grid> */}
+              </Grid>
                 
-              {/* <Grid item xs={1}>
-                <div
+              <Grid item xs={1}>
+                {/* <div
                     ref={ (divElement) => { this.divElement = divElement } }>
                       <PieChart width={dim} height={dim}>
                           <Pie
@@ -277,9 +285,12 @@ class Main extends React.Component {
                               onMouseEnter={this.onPieEnter}
                           />
                     </PieChart>
-                </div>
-              </Grid> */}
-            {/* </Grid> */}
+                </div> */}
+
+                {pieChartComponent}
+
+              </Grid>
+            </Grid>
         </div>
     );
   }
