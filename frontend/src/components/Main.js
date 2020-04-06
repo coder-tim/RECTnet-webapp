@@ -25,6 +25,7 @@ import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import Loader from 'react-loader-spinner';
 import { PieChart, Pie, Sector } from 'recharts';
 import cloneDeep from 'lodash/cloneDeep';
+import '../styles/Main.css';
 
 // Pie chart used to display predicted emotions
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
@@ -92,8 +93,8 @@ class Main extends React.Component {
       activeIndex: 0,
       height: 400,
       data: [
-        { name: 'Neutral',    value: 0.02 },
         { name: 'Happiness',  value: 0.8 },
+        { name: 'Neutral',    value: 0.02 },
         { name: 'Sadness',    value: 0.02 },
         { name: 'Surprise',   value: 0.02 },
         { name: 'Fear',       value: 0.02 },
@@ -200,7 +201,7 @@ class Main extends React.Component {
         height: '20em',
         width: '30em',
         marginTop: 50,
-        marginLeft: 130,
+        marginLeft: 10,
 
     }
 
@@ -265,17 +266,18 @@ class Main extends React.Component {
     return (
         <div className="Main">
             <p style={{fontFamily: 'sans-serif', fontSize: 45, color: '#696969'}}>RECTnet</p>
-            <div> 
-              <Button variant="contained" color="primary" component="label" style={{marginRight:30}}>
+            <div className="MainButtons"> 
+              <Button className="UploadButton" variant="contained" color="primary" component="label" style={{marginRight:30}}>
                 Upload
                 <input type="file" onChange={this.fileSelectedHandler} style={{ display: "none" }}/>
               </Button> 
-              <Button onClick={this.predictHandler} variant="contained" color="primary" component="span">
+              <Button className="PredictButton" onClick={this.predictHandler} variant="contained" color="primary" component="span">
                 Predict
               </Button>
             </div> 
             {predictionResult}
-            <Grid container spacing={1} >
+
+            <Grid className="Image" container spacing={1} >
               <Grid item xs={9} >
                 <img src={this.state.imagePreviewUrl} style={{...imageStyle}} />
               </Grid>

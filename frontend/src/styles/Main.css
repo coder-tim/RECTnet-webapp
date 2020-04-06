@@ -1,0 +1,29 @@
+.Image {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+/* .MainButtons {
+    flex-direction: row;
+} */
+
+@media only screen and (max-width: 700px) {
+    /* .MainButtons {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;       
+    }
+
+    .UploadButton {
+    }
+
+    .PredictButton {
+        margin-top: 20%;
+    } */
+
+    .Image {
+        flex-direction: column;
+        flex-wrap: wrap;
+    }
+  }
