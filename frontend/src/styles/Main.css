@@ -1,26 +1,50 @@
+.Title {
+    margin-right: 23%;
+}
+
+.MainButtons {
+    display: flex;
+    flex-direction: row;
+    margin-left: 28%;
+}
+
+
+/* .MainButtons {
+    flex-direction: row;
+} */
+
+.PredictResult {
+    margin-right: 25%;
+}
+
 .Image {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
 }
 
-/* .MainButtons {
-    flex-direction: row;
-} */
-
 @media only screen and (max-width: 700px) {
-    /* .MainButtons {
+    .Title {
+        margin-left: 0;
+    }
+
+    .MainButtons {
         display: flex;
         flex-direction: column;
-        flex-wrap: wrap;       
+        margin-left: 0;
     }
 
     .UploadButton {
+        margin:0 ;
     }
 
     .PredictButton {
-        margin-top: 20%;
-    } */
+        margin:0 ;
+    }
+
+    .PredictResult {
+        margin-right: 0;
+    }
 
     .Image {
         flex-direction: column;

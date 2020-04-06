@@ -222,7 +222,7 @@ class Main extends React.Component {
     let pieChartComponent;
 
     if (this.state.resultFinishedLoading === true) {
-       predictionResult = <div>
+       predictionResult = <div className="PredictResult">
                             <p style={{marginTop: 70 ,fontFamily: 'sans-serif', fontSize: 20, color: '#3f51b5'}}>Prediction:   
                             {'   '}
                             {this.state.predictedResult 
@@ -231,7 +231,7 @@ class Main extends React.Component {
                               && this.state.predictedResult['faces'][0]['class'].split(" ")[1]
                             }</p>
                           </div>;
-       pieChartComponent =   <div
+       pieChartComponent =   <div className="PredictResult"
                                 ref={ (divElement) => { this.divElement = divElement } }>
                                     <PieChart width={800} height={400}>
                                         <Pie
@@ -251,7 +251,8 @@ class Main extends React.Component {
 
 
     } else if (this.state.resultFinishedLoading === false) {
-        predictionResult = <Loader
+        predictionResult = <Loader 
+                            className="PredictResult"
                             type="Rings"
                             color="#3f51b5"
                             height={150}
@@ -265,18 +266,19 @@ class Main extends React.Component {
 
     return (
         <div className="Main">
-            <p style={{fontFamily: 'sans-serif', fontSize: 45, color: '#696969'}}>RECTnet</p>
+            <p className="Title" style={{fontFamily: 'sans-serif', fontSize: 45, color: '#696969'}}>RECTnet</p>
             <div className="MainButtons"> 
-              <Button className="UploadButton" variant="contained" color="primary" component="label" style={{marginRight:30}}>
+              <Button className="UploadButton" variant="contained" color="primary" component="label" style={{marginRight: '5px', marginBottom: '5px'}}>
                 Upload
                 <input type="file" onChange={this.fileSelectedHandler} style={{ display: "none" }}/>
               </Button> 
-              <Button className="PredictButton" onClick={this.predictHandler} variant="contained" color="primary" component="span">
+              <Button className="PredictButton" onClick={this.predictHandler} variant="contained" color="primary" component="span" style={{marginRight: '5px', marginBottom: '5px'}}>
                 Predict
               </Button>
             </div> 
-            {predictionResult}
-
+            <div>
+              {predictionResult}
+            </div>
             <Grid className="Image" container spacing={1} >
               <Grid item xs={9} >
                 <img src={this.state.imagePreviewUrl} style={{...imageStyle}} />
