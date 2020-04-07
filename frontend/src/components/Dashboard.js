@@ -21,6 +21,7 @@ import { mainListItems, secondaryListItems } from './listItems';
 import Main from './Main';
 import EmotionsChart from './EmotionsChart';
 import style from '../styles/Dashboard.css';
+import { nanoid } from 'nanoid'
 
 import HistoryPreview from './HistoryPreview';
 
@@ -134,14 +135,14 @@ export default function Dashboard() {
     var historyArr = window.localStorage.getItem('emo-history')
     if (!historyArr) historyArr = []
     else historyArr = JSON.parse(historyArr)
-    historyArr.push({data: historyData, time: time})
+    historyArr.push({data: historyData, time: time, id: nanoid()})
     // organized based on date
     historyArr.sort(function(a,b){
       // Turn your strings into dates, and then subtract them
       // to get a value that is either negative, positive, or zero.
       return new Date(b.date) - new Date(a.date);
     });
-    console.log(historyArr)
+    // console.log(historyArr)
     window.localStorage.setItem('emo-history', JSON.stringify(historyArr))
 
     setHistoryCount(historyCount + 1)

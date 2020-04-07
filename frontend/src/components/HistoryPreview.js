@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Container, Grid, Button, Paper, ListItem, List, CHeckbox, ListItemIcon, ListItemText,  ListItemSecondaryAction, IconButton, Box, Divider} from '@material-ui/core';
 import TimelineIcon from '@material-ui/icons/Timeline';
+import ClearAllIcon from '@material-ui/icons/ClearAll';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import { PureComponent } from 'react';
 import {
@@ -37,10 +38,33 @@ class HistoryPreview extends Component {
     }
 
     updateHistory = () => {
-        var data = window.localStorage.getItem('emo-history');
-        if (!!data) this.setState({data: JSON.parse(data)})
+        let data = window.localStorage.getItem('emo-history');
+        try{
+            if (!!data && JSON.parse(data).length !== 0) this.setState({data: JSON.parse(data)})
+            else {
+                this.setShowFullHistory(false)
+                this.setState({data:[]})
+            }
+        } catch (error) {
+            this.setState()
+            return
+        }
         console.log("Preview Component loaded")
         // console.log(JSON.parse(data))
+    }
+
+    removeHistory = hid => {
+        let data = window.localStorage.getItem('emo-history');
+        if (!data) return;
+
+        try {
+            data = JSON.parse(data)
+            data.splice(hid, 1)
+            window.localStorage.setItem('emo-history', JSON.stringify(data))
+        } catch (error) {
+            this.setState()
+        }
+        this.updateHistory()
     }
 
     setShowFullHistory = (show=true) => {
@@ -84,8 +108,10 @@ class HistoryPreview extends Component {
             emptyLine: {
                 marginBottom:"20px"
             },
-            margin: {
-                margin: "10px"
+            emotionButton: {
+                margin: "4px",
+                marginTop: "10px",
+                marginBottom: "10px",
             }
         }
 
@@ -99,15 +125,26 @@ class HistoryPreview extends Component {
         }
 
         if (!this.state.showFullHistory) {
-            var historyButton = <Button disabled={!this.state.data} 
+            var historyButton = <Button disabled={!this.state.data || this.state.data.length===0} 
                 onClick={()=>{this.setShowFullHistory(true)}}>
                 <TimelineIcon/> &nbsp; Show full history
             </Button>
         } else {
-            var historyButton = <Button 
-                onClick={()=>{this.setShowFullHistory(false)}}>
-                <TimelineIcon/> &nbsp; Hide full history
-            </Button>
+            var historyButton = <Grid item>
+                <Button
+                    onClick={()=>{
+                        this.setShowFullHistory(false)
+                        window.localStorage.removeItem('emo-history', null)
+                        this.updateHistory()
+                    }}>
+                    <ClearAllIcon/> &nbsp; Clear History
+                </Button>
+                <Button     
+                    onClick={()=>{this.setShowFullHistory(false)}}>
+                    <TimelineIcon/> &nbsp; Hide full history
+                </Button>
+            </Grid>
+            
         }
 
         var historyPanel = <React.Fragment>Graph</React.Fragment>
@@ -150,7 +187,8 @@ class HistoryPreview extends Component {
                                 <ListItemSecondaryAction>
                                     <Grid container spacing={2} alignItems="center">
                                         <ListItemText id={i} primary={`Saved at ${v.time}`} />
-                                        <IconButton aria-label="delete" className={emotion_classes.margin}>
+                                        <IconButton aria-label="delete" className={emotion_classes.margin}
+                                            onClick={()=>this.removeHistory(i)}>
                                             <DeleteForeverIcon fontSize="small" />
                                         </IconButton>
                                     </Grid>
@@ -199,11 +237,11 @@ class HistoryPreview extends Component {
 
             var trendGraph = 
                     <LineChart
-                        width={this.state.dimensions.width / 1.2 - 40}
+                        width={this.state.dimensions.width / 1.1 - 40}
                         height={300}
                         data={trendData}
                         margin={{
-                        top: 5, right: 10, left: 10, bottom: 5,
+                        top: 5, right: 10, left: 0, bottom: 5,
                         }}
                     >
                         <CartesianGrid strokeDasharray="3 3" />
@@ -223,11 +261,11 @@ class HistoryPreview extends Component {
                     {historyList}
                     <Divider style={styles.emptyLine}/>
                 </Grid>
-                <Grid container spacing={2} direction="row" justify="center">
+                <Grid container spacing={1} direction="row" justify="center">
                     {emotion_classes.map((emotion,i)=>{
                         let color = this.state.chartEmotions[i] ? "primary" : "default"
                         let variant = this.state.chartEmotions[i] ? "contained" : "outlined"
-                        return <Button size="small" key={i} onClick={()=>this.setChartEmotions(i)} color={color} variant={variant} style={styles.margin}>
+                        return <Button size="small" key={i} onClick={()=>this.setChartEmotions(i)} color={color} variant={variant} style={styles.emotionButton}>
                             {emotion}
                         </Button>
                     })}
