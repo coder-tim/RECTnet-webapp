@@ -195,6 +195,9 @@ class Main extends React.Component {
 
           console.log(this.state.predictedResult);
           for (let i = 0; i <  dataCopy.length; i++) {
+            if (dataCopy[i].name === mood) {
+              this.setState({activeIndex: i});
+            }
             dataCopy[i].value = this.state.predictedResult['faces'][0]['details'][i];
           }
   
@@ -211,12 +214,9 @@ class Main extends React.Component {
             }
           }
 
-
         } else {
           console.log("No faces detected in the photo");
-          this.setState({predictedResult: 'No faces found in the photo'});
         }
-     
       });      
     }
   }
@@ -267,8 +267,8 @@ class Main extends React.Component {
                                                 data={this.state.data}
                                                 cx={dim/2 + 80}
                                                 cy={dim/2}
-                                                innerRadius={dim/6}
-                                                outerRadius={dim/5}
+                                                innerRadius={dim/5 + 40}
+                                                outerRadius={dim/4 + 40}
                                                 fill="#8884d8"
                                                 dataKey="value"
                                                 onMouseEnter={this.onPieEnter}
