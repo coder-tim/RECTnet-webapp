@@ -160,37 +160,36 @@ class HistoryPreview extends Component {
                     }
                 </List>   
             } else {
-                historyList = <Grid alignItems="center"> <List m={2}>
-                    {
-                        displayData.map((v,i) => {
-                            return <ListItem key={i} role={undefined} dense button onClick={()=>{this.setState()}} >                                      
-                                       <Box display="flex" flexDirection="row">
-                                            <Box display="flex" flexDirection="column">
-                                                <Box m="0">
-                                                    <ListItemText id={i} primary={`${v.emotion}: ${v.confidence}%`} />
+                historyList = <Grid alignItems="center"> 
+                    <List m={2}>
+                        {
+                            displayData.map((v,i) => {
+                                return <ListItem key={i} role={undefined} dense button onClick={()=>{this.setState()}} >                                      
+                                        <Box display="flex" flexDirection="row" width={1}>
+                                                <Box display="flex" flexDirection="column" flexGrow={1}>
+                                                    <Box m="0">
+                                                        <ListItemText id={i} primary={`${v.emotion}: ${v.confidence}%`} />
+                                                    </Box>
+                                                    <Box m="0">                                            
+                                                        <ListItemText id={i} primary={`${v.time}`} />                                              
+                                                    </Box>
                                                 </Box>
-                                                <Box m="0">                                            
-                                                    <ListItemText id={i} primary={`${v.time}`} />                                              
-                                                </Box>
+                                                <Box alignItems="flex-end">
+                                                    <IconButton aria-label="delete" className={emotion_classes.margin}>
+                                                        <DeleteForeverIcon fontSize="medium" />
+                                                    </IconButton>
+                                                </Box>   
                                             </Box>
-
-                                        </Box>
-                                        <Box alignItems="flex-end">
-                                                <IconButton aria-label="delete" className={emotion_classes.margin}>
-                                                    <DeleteForeverIcon fontSize="medium" />
-                                                </IconButton>
-                                            </Box>                          
-                                    </ListItem>                              
-                        }) 
-                    }
-                    
-                </List>   
+                                            <Divider />   
+                                        </ListItem>   
+                                                               
+                            }) 
+                        }                
+                    </List>   
                 </Grid>
             }   
             
       
-        
-
 
             var displayList = []
             this.state.chartEmotions.forEach((v,i)=>{
