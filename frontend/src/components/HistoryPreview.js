@@ -20,7 +20,7 @@ const emotion_colors = [
     '#888888',
     '#4AB847',
     '#1962AF',
-    '#FCE826',
+    '#E8C058',
     '#F69120',
     '#612D91',
     '#E71D25'
@@ -108,12 +108,23 @@ class HistoryPreview extends Component {
             emptyLine: {
                 marginBottom:"20px"
             },
-            emotionButton: {
+            emotionButtons: [],
+            emotionButtonsDisabled: []
+        }
+
+        emotion_classes.forEach((v, i)=>{
+            styles.emotionButtons.push({
+                backgroundColor: emotion_colors[i],
                 margin: "4px",
                 marginTop: "10px",
                 marginBottom: "10px",
-            }
-        }
+            })
+            styles.emotionButtonsDisabled.push({
+                margin: "4px",
+                marginTop: "10px",
+                marginBottom: "10px",
+            })
+        })
 
         if (!this.state.data || this.state.data.length === 0) {
             display = <h3>No history</h3>
@@ -227,8 +238,6 @@ class HistoryPreview extends Component {
                 </Grid>
             }   
             
-      
-
             var displayList = []
             this.state.chartEmotions.forEach((v,i)=>{
                 if (v === true)
@@ -265,7 +274,8 @@ class HistoryPreview extends Component {
                     {emotion_classes.map((emotion,i)=>{
                         let color = this.state.chartEmotions[i] ? "primary" : "default"
                         let variant = this.state.chartEmotions[i] ? "contained" : "outlined"
-                        return <Button size="small" key={i} onClick={()=>this.setChartEmotions(i)} color={color} variant={variant} style={styles.emotionButton}>
+                        let style = this.state.chartEmotions[i] ? styles.emotionButtons[i] : styles.emotionButtonsDisabled[i]
+                        return <Button size="small" key={i} onClick={()=>this.setChartEmotions(i)} color={color} variant={variant} style={style}>
                             {emotion}
                         </Button>
                     })}
