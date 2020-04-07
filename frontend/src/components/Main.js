@@ -119,6 +119,7 @@ class Main extends React.Component {
     });
   };
 
+  // Used for uploading photo
   fileSelectedHandler = event => {
     event.preventDefault();
     let reader = new FileReader();
@@ -149,9 +150,27 @@ class Main extends React.Component {
         return response.json();
       })
       .then((data) => {
+        // Reset the state after a new photo is uploaded
+        // So that previous prediction doesn't affect current prediction
+        let resetData = [
+          { name: 'Happiness',  value: 0.02 },
+          { name: 'Neutral',    value: 0.02 },
+          { name: 'Sadness',    value: 0.02 },
+          { name: 'Surprise',   value: 0.02 },
+          { name: 'Fear',       value: 0.02 },
+          { name: 'Disgust',    value: 0.02 },
+          { name: 'Anger',      value: 0.02 },        
+        ]
+
+        this.setState({
+          data: resetData
+        })
+
+        // Change incoming data to correct JSON format
         data = data.split('(').join('[');
         data = data.split(')').join(']');
         data = data.replace(/\'/g, '\"');
+        
         let result = JSON.parse(data);
         let mood = '';
         let confidence = '';
@@ -162,34 +181,33 @@ class Main extends React.Component {
           resultFinishedLoading: true
         })
 
-        if (this.state.predictedResult 
-              && this.state.predictedResult['faces']
-              // && this.state.predictedResult['faces'][0]
-              // && this.state.predictedResult['faces'][0]['class']
-              ) {
+        if (this.state.predictedResult && this.state.predictedResult['faces'] && this.state.predictedResult['faces'][0]
+                                                                          && this.state.predictedResult['faces'][0]['class']
+                                                                          ) {
           mood = this.state.predictedResult['faces'][0]['class'].split(" ")[1];
           confidence = this.state.predictedResult['faces'][0]['confidence']; 
           confidence = confidence.toFixed(1);
           dataEntryToBeReplaced.name = mood;
           dataEntryToBeReplaced.value = Number(confidence);
+
+          let dataCopy = cloneDeep(this.state.data);
+
+          console.log(dataCopy);
+          for (let i = 0; i <  dataCopy.length; i++) {
+            if (dataCopy[i].name === mood) {
+              dataCopy[i] = dataEntryToBeReplaced;
+            }          
+          }
+  
+          console.log(dataCopy);
+          this.setState({data: dataCopy});
+
+        } else {
+          console.log("No faces detected in the photo");
+          this.setState({predictedResult: 'No faces found in the photo'});
         }
-        console.log(mood);
-        console.log(confidence);
-        console.log(dataEntryToBeReplaced);
-
-        let dataCopy = cloneDeep(this.state.data);
-
-        console.log(dataCopy);
-        for (let i = 0; i <  dataCopy.length; i++) {
-          if (dataCopy[i].name === mood) {
-            dataCopy[i] = dataEntryToBeReplaced;
-          }          
-        }
-
-        console.log(dataCopy);
-        this.setState({data: dataCopy});
-                              
-        });      
+     
+      });      
     }
   }
 
@@ -198,11 +216,8 @@ class Main extends React.Component {
     let dim = this.state.height / 1.2;
 
     let imageStyle = {
-        height: '20em',
-        width: '30em',
         marginTop: 50,
         marginLeft: 10,
-
     }
 
     const useStyles = makeStyles((theme) => ({
@@ -222,33 +237,40 @@ class Main extends React.Component {
     let pieChartComponent;
 
     if (this.state.resultFinishedLoading === true) {
-       predictionResult = <div className="PredictResult">
-                            <p style={{marginTop: 70 ,fontFamily: 'sans-serif', fontSize: 20, color: '#3f51b5'}}>Prediction:   
-                            {'   '}
-                            {this.state.predictedResult 
-                              && this.state.predictedResult['faces']
-                              && this.state.predictedResult['faces'][0]
-                              && this.state.predictedResult['faces'][0]['class'].split(" ")[1]
-                            }</p>
-                          </div>;
-       pieChartComponent =   <div className="PredictResult"
-                                ref={ (divElement) => { this.divElement = divElement } }>
-                                    <PieChart width={800} height={400}>
-                                        <Pie
-                                            activeIndex={this.state.activeIndex}
-                                            activeShape={renderActiveShape}
-                                            data={this.state.data}
-                                            cx={dim/2 + 80}
-                                            cy={dim/2}
-                                            innerRadius={dim/6}
-                                            outerRadius={dim/5}
-                                            fill="#8884d8"
-                                            dataKey="value"
-                                            onMouseEnter={this.onPieEnter}
-                                        />
-                                    </PieChart>
-                                </div>
 
+
+      if (this.state.predictedResult && this.state.predictedResult['faces'] && this.state.predictedResult['faces'][0]) {
+            predictionResult = <div className="PredictResult">
+                                  <p style={{marginTop: 70 ,fontFamily: 'sans-serif', fontSize: 20, color: '#3f51b5'}}>Prediction:   
+                                  {'   '}
+
+                                  {this.state.predictedResult['faces'][0]['class'].split(" ")[1]}
+                                  </p>
+                                </div>;
+
+            pieChartComponent =  <div className="PredictResult"
+                                    ref={ (divElement) => { this.divElement = divElement } }>
+                                        <PieChart width={800} height={400}>
+                                            <Pie
+                                                activeIndex={this.state.activeIndex}
+                                                activeShape={renderActiveShape}
+                                                data={this.state.data}
+                                                cx={dim/2 + 80}
+                                                cy={dim/2}
+                                                innerRadius={dim/6}
+                                                outerRadius={dim/5}
+                                                fill="#8884d8"
+                                                dataKey="value"
+                                                onMouseEnter={this.onPieEnter}
+                                            />
+                                        </PieChart>
+                                    </div>
+      } else {
+        predictionResult = <div className="PredictResult">
+                            <p style={{marginTop: 70 ,fontFamily: 'sans-serif', fontSize: 20, color: '#3f51b5'}}>No Face(s) detected.</p>
+                          </div>;
+        pieChartComponent = null;
+      }
 
     } else if (this.state.resultFinishedLoading === false) {
         predictionResult = <Loader 
@@ -266,7 +288,7 @@ class Main extends React.Component {
 
     return (
         <div className="Main">
-            <p className="Title" style={{fontFamily: 'sans-serif', fontSize: 45, color: '#696969'}}>RECTnet</p>
+            {/* <p className="Title" style={{fontFamily: 'sans-serif', fontSize: 45, color: '#696969'}}>RECTnet</p> */}
             <div className="MainButtons"> 
               <Button className="UploadButton" variant="contained" color="primary" component="label" style={{marginRight: '5px', marginBottom: '5px'}}>
                 Upload
@@ -281,7 +303,7 @@ class Main extends React.Component {
             </div>
             <Grid className="Image" container spacing={1} >
               <Grid item xs={9} >
-                <img src={this.state.imagePreviewUrl} style={{...imageStyle}} />
+                <img className="ImageBox" src={this.state.imagePreviewUrl} style={{...imageStyle}} />
               </Grid>
               <Grid item xs={1}>
                 {pieChartComponent}
