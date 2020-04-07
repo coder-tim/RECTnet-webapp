@@ -27,6 +27,15 @@ import { PieChart, Pie, Sector } from 'recharts';
 import cloneDeep from 'lodash/cloneDeep';
 import '../styles/Main.css';
 
+/*
+Refactor:
+1) Put all in-line CSS into CSS failes
+2) Put pie chart functions into separate component file
+3) For resetting state.data, remove lines 154-168, create new function
+4) lines 185-189, think of better way for accessing nested JSON
+*/
+
+
 // Pie chart used to display predicted emotions
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 const RADIAN = Math.PI / 180;
@@ -173,9 +182,7 @@ class Main extends React.Component {
         data = data.replace(/\'/g, '\"');
         
         let result = JSON.parse(data);
-        let mood = '';
-        let confidence = '';
-        let dataEntryToBeReplaced = {name: '', value: 0}; 
+        let primaryMood = '';
 
         this.setState({
           predictedResult: result,
@@ -183,25 +190,18 @@ class Main extends React.Component {
         })
 
         if (this.state.predictedResult && this.state.predictedResult['faces'] && this.state.predictedResult['faces'][0]
-                                                                          && this.state.predictedResult['faces'][0]['class']
-                                                                          ) {
-          mood = this.state.predictedResult['faces'][0]['class'].split(" ")[1];
-          confidence = this.state.predictedResult['faces'][0]['confidence']; 
-          confidence = confidence.toFixed(1);
-          dataEntryToBeReplaced.name = mood;
-          dataEntryToBeReplaced.value = Number(confidence);
+                                                                          && this.state.predictedResult['faces'][0]['class']) {
+          primaryMood = this.state.predictedResult['faces'][0]['class'].split(" ")[1];
 
           let dataCopy = cloneDeep(this.state.data);
 
-          console.log(this.state.predictedResult);
           for (let i = 0; i <  dataCopy.length; i++) {
-            if (dataCopy[i].name === mood) {
+            if (dataCopy[i].name === primaryMood) {
               this.setState({activeIndex: i});
             }
             dataCopy[i].value = this.state.predictedResult['faces'][0]['details'][i];
           }
   
-          console.log(dataCopy);
           this.setState({data: dataCopy});
 
           // NOTE Save to history 
@@ -222,7 +222,6 @@ class Main extends React.Component {
   }
 
   render() {
-    // Used for pie chart
     let dim = this.state.height / 1.2;
 
     let imageStyle = {
@@ -247,13 +246,10 @@ class Main extends React.Component {
     let pieChartComponent;
 
     if (this.state.resultFinishedLoading === true) {
-
-
       if (this.state.predictedResult && this.state.predictedResult['faces'] && this.state.predictedResult['faces'][0]) {
             predictionResult = <div className="PredictResult">
                                   <p style={{marginTop: 70 ,fontFamily: 'sans-serif', fontSize: 20, color: '#3f51b5'}}>Prediction:   
                                   {'   '}
-
                                   {this.state.predictedResult['faces'][0]['class'].split(" ")[1]}
                                   </p>
                                 </div>;

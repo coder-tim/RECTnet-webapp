@@ -32,7 +32,7 @@ class HistoryPreview extends Component {
         this.state = { 
             data: [],
             showFullHistory: false,
-            chartEmotions: [true, true, false, false, false, false, false]
+            chartEmotions: [true, true, false, false, false, false, false],
         };
     }
 
@@ -53,6 +53,15 @@ class HistoryPreview extends Component {
         this.setState({chartEmotions})
     }
 
+    updateDimensions = () => {
+        this.setState({
+            dimensions: {
+              width: window.innerWidth,
+              height: window.innerHeight,
+            },
+          });
+    };
+
     componentDidMount() {
         this.updateHistory()
         this.setState({
@@ -60,13 +69,13 @@ class HistoryPreview extends Component {
               width: window.innerWidth,
               height: window.innerHeight,
             },
-          });
+        });
+        window.addEventListener('resize', this.updateDimensions);
     }
 
     componentDidUpdate(prevProps) {
         if (this.props.hisCount !== prevProps.hisCount) this.updateHistory()
     }
-
 
     render() {
         var display;
@@ -131,23 +140,57 @@ class HistoryPreview extends Component {
                 )
             })
 
-            var historyList = <List m={2}>
-                {
-                    displayData.map((v,i) => {
-                        return <ListItem key={i} role={undefined} dense button onClick={()=>{this.setState()}} >
-                            <ListItemText id={i} primary={`Mood: ${v.emotion}, confidence: ${v.confidence}%`} />
-                            <ListItemSecondaryAction>
-                                <Grid container spacing={2} alignItems="center">
-                                    <ListItemText id={i} primary={`Saved at ${v.time}`} />
-                                    <IconButton aria-label="delete" className={emotion_classes.margin}>
-                                        <DeleteForeverIcon fontSize="small" />
-                                    </IconButton>
-                                </Grid>
-                            </ListItemSecondaryAction>
-                        </ListItem>
-                    })
-                }
-            </List>           
+            var historyList;
+            if (this.state.dimensions.width > 650) {
+                historyList = <List m={2}>
+                    {
+                        displayData.map((v,i) => {
+                            return <ListItem key={i} role={undefined} dense button onClick={()=>{this.setState()}} >
+                                <ListItemText id={i} primary={`Mood: ${v.emotion}, confidence: ${v.confidence}%`} />
+                                <ListItemSecondaryAction>
+                                    <Grid container spacing={2} alignItems="center">
+                                        <ListItemText id={i} primary={`Saved at ${v.time}`} />
+                                        <IconButton aria-label="delete" className={emotion_classes.margin}>
+                                            <DeleteForeverIcon fontSize="small" />
+                                        </IconButton>
+                                    </Grid>
+                                </ListItemSecondaryAction>
+                            </ListItem>
+                        })
+                    }
+                </List>   
+            } else {
+                historyList = <Grid alignItems="center"> <List m={2}>
+                    {
+                        displayData.map((v,i) => {
+                            return <ListItem key={i} role={undefined} dense button onClick={()=>{this.setState()}} >                                      
+                                       <Box display="flex" flexDirection="row">
+                                            <Box display="flex" flexDirection="column">
+                                                <Box m="0">
+                                                    <ListItemText id={i} primary={`${v.emotion}: ${v.confidence}%`} />
+                                                </Box>
+                                                <Box m="0">                                            
+                                                    <ListItemText id={i} primary={`${v.time}`} />                                              
+                                                </Box>
+                                            </Box>
+
+                                        </Box>
+                                        <Box alignItems="flex-end">
+                                                <IconButton aria-label="delete" className={emotion_classes.margin}>
+                                                    <DeleteForeverIcon fontSize="medium" />
+                                                </IconButton>
+                                            </Box>                          
+                                    </ListItem>                              
+                        }) 
+                    }
+                    
+                </List>   
+                </Grid>
+            }   
+            
+      
+        
+
 
             var displayList = []
             this.state.chartEmotions.forEach((v,i)=>{
