@@ -69,7 +69,7 @@ const renderActiveShape = (props) => {
       />
       <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none" />
       <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
-      <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill="#333">{`${payload.name} ${value}`}</text>
+      <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill="#333">{`${payload.name}`}</text>
       <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} dy={18} textAnchor={textAnchor} fill="#999">
         {`(Rate ${(percent * 100).toFixed(2)}%)`}
       </text>
@@ -93,13 +93,13 @@ class Main extends React.Component {
       activeIndex: 0,
       height: 400,
       data: [
-        { name: 'Happiness',  value: 0.8 },
-        { name: 'Neutral',    value: 0.02 },
-        { name: 'Sadness',    value: 0.02 },
-        { name: 'Surprise',   value: 0.02 },
-        { name: 'Fear',       value: 0.02 },
-        { name: 'Disgust',    value: 0.02 },
-        { name: 'Anger',      value: 0.02 },        
+        { name: 'Neutral',  value: 0.00 },
+        { name: 'Happiness',    value: 0.00 },
+        { name: 'Sadness',    value: 0.00 },
+        { name: 'Surprise',   value: 0.00 },
+        { name: 'Fear',       value: 0.00 },
+        { name: 'Disgust',    value: 0.00 },
+        { name: 'Anger',      value: 0.00 },        
       ]
     };
   }
@@ -150,20 +150,21 @@ class Main extends React.Component {
         return response.json();
       })
       .then((data) => {
-        // Reset the state after a new photo is uploaded
-        // So that previous prediction doesn't affect current prediction
-        let resetData = [
-          { name: 'Happiness',  value: 0.02 },
-          { name: 'Neutral',    value: 0.02 },
-          { name: 'Sadness',    value: 0.02 },
-          { name: 'Surprise',   value: 0.02 },
-          { name: 'Fear',       value: 0.02 },
-          { name: 'Disgust',    value: 0.02 },
-          { name: 'Anger',      value: 0.02 },        
+
+        let emptyData = [
+          { name: 'Neutral',  value: 0.00 },
+          { name: 'Happiness',    value: 0.00 },
+          { name: 'Sadness',    value: 0.00 },
+          { name: 'Surprise',   value: 0.00 },
+          { name: 'Fear',       value: 0.00 },
+          { name: 'Disgust',    value: 0.00 },
+          { name: 'Anger',      value: 0.00 },        
         ]
 
+        // Reset the state after a new photo is uploaded
+        // So that previous prediction doesn't affect current prediction
         this.setState({
-          data: resetData
+          data: emptyData
         })
 
         // Change incoming data to correct JSON format
@@ -192,11 +193,9 @@ class Main extends React.Component {
 
           let dataCopy = cloneDeep(this.state.data);
 
-          console.log(dataCopy);
+          console.log(this.state.predictedResult);
           for (let i = 0; i <  dataCopy.length; i++) {
-            if (dataCopy[i].name === mood) {
-              dataCopy[i] = dataEntryToBeReplaced;
-            }          
+            dataCopy[i].value = this.state.predictedResult['faces'][0]['details'][i];
           }
   
           console.log(dataCopy);
