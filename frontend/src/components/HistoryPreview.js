@@ -7,8 +7,8 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
 
-const emotion_classes = ['Happiness', 
-    'Neutral',   
+const emotion_classes = ['Neutral',
+    'Happiness',        
     'Sadness',   
     'Surprise',  
     'Fear',      
@@ -32,7 +32,7 @@ class HistoryPreview extends Component {
         this.state = { 
             data: [],
             showFullHistory: false,
-            chartEmotions: [true, false, false, false, false, false, false]
+            chartEmotions: [true, true, false, false, false, false, false]
         };
     }
 
@@ -157,7 +157,7 @@ class HistoryPreview extends Component {
 
             var trendGraph = 
                     <LineChart
-                        width={this.state.dimensions.width / 1.2 - 80}
+                        width={this.state.dimensions.width / 1.2 - 40}
                         height={300}
                         data={trendData}
                         margin={{
@@ -181,7 +181,7 @@ class HistoryPreview extends Component {
                     {historyList}
                     <Divider style={styles.emptyLine}/>
                 </Grid>
-                <Grid container spacing={2} direction="row" justify="space-evenly">
+                <Grid container spacing={2} direction="row" justify="center">
                     {emotion_classes.map((emotion,i)=>{
                         let color = this.state.chartEmotions[i] ? "primary" : "default"
                         let variant = this.state.chartEmotions[i] ? "contained" : "outlined"
