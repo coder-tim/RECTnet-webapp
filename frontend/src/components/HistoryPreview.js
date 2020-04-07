@@ -164,7 +164,7 @@ class HistoryPreview extends Component {
                     <List m={2}>
                         {
                             displayData.map((v,i) => {
-                                return <ListItem key={i} role={undefined} dense button onClick={()=>{this.setState()}} >                                      
+                                return <ListItem key={i} role={undefined} dense button onClick={()=>{this.setState()}} divider={true}>                                      
                                         <Box display="flex" flexDirection="row" width={1}>
                                                 <Box display="flex" flexDirection="column" flexGrow={1}>
                                                     <Box m="0">
@@ -180,7 +180,7 @@ class HistoryPreview extends Component {
                                                     </IconButton>
                                                 </Box>   
                                             </Box>
-                                            <Divider />   
+                                               
                                         </ListItem>   
                                                                
                             }) 
