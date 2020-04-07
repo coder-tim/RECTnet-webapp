@@ -202,6 +202,17 @@ class Main extends React.Component {
           console.log(dataCopy);
           this.setState({data: dataCopy});
 
+          // NOTE Save to history 
+          // Only if there is one face in the picture
+          if (this.state.predictedResult['faces'].length == 1) {
+            let hData = []
+            this.state.predictedResult['faces'][0].details.forEach(v=>hData.push(parseInt(100000*v)/1000))
+            if (!!this.props.saveHistory) {
+              this.props.saveHistory(hData)
+            }
+          }
+
+
         } else {
           console.log("No faces detected in the photo");
           this.setState({predictedResult: 'No faces found in the photo'});

@@ -1,31 +1,28 @@
-import React from 'react';
-import clsx from 'clsx';
-import { makeStyles } from '@material-ui/core/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Drawer from '@material-ui/core/Drawer';
-import Box from '@material-ui/core/Box';
 import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import List from '@material-ui/core/List';
-import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
-import IconButton from '@material-ui/core/IconButton';
-import Badge from '@material-ui/core/Badge';
+import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import Divider from '@material-ui/core/Divider';
+import Drawer from '@material-ui/core/Drawer';
 import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
+import IconButton from '@material-ui/core/IconButton';
 import Link from '@material-ui/core/Link';
-import MenuIcon from '@material-ui/icons/Menu';
+import List from '@material-ui/core/List';
+import Paper from '@material-ui/core/Paper';
+import { makeStyles } from '@material-ui/core/styles';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import NotificationsIcon from '@material-ui/icons/Notifications';
-import { mainListItems, secondaryListItems } from './listItems';
+import MenuIcon from '@material-ui/icons/Menu';
+import clsx from 'clsx';
+import React from 'react';
 import Chart from './Chart';
-import Deposits from './Deposits';
-import Orders from './Orders';
+import { mainListItems, secondaryListItems } from './listItems';
 import Main from './Main';
 import EmotionsChart from './EmotionsChart';
 import style from '../styles/Dashboard.css';
 
+import HistoryPreview from './HistoryPreview';
 
 function Copyright() {
   return (
@@ -121,11 +118,34 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+// var 
+
 export default function Dashboard() {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
 
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+
+  const [historyCount, setHistoryCount] = React.useState(0);
+  var saveHistory = (historyData, time=null) => {
+    if (time === null) time = new Date()
+    
+    // load previous history
+    var historyArr = window.localStorage.getItem('emo-history')
+    if (!historyArr) historyArr = []
+    else historyArr = JSON.parse(historyArr)
+    historyArr.push({data: historyData, time: time})
+    // organized based on date
+    historyArr.sort(function(a,b){
+      // Turn your strings into dates, and then subtract them
+      // to get a value that is either negative, positive, or zero.
+      return new Date(b.date) - new Date(a.date);
+    });
+    console.log(historyArr)
+    window.localStorage.setItem('emo-history', JSON.stringify(historyArr))
+
+    setHistoryCount(historyCount + 1)
+  }
 
   return (
     <div className={classes.root}>
@@ -142,8 +162,18 @@ export default function Dashboard() {
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
-              <Main/>
+              
             {/* <Copyright /> */}
+            <Grid container  spacing={3}>
+              <Grid item xs={12} lg={12} md={12}>
+                <Paper className={classes.paper}>
+                <HistoryPreview hisCount={historyCount}/>
+                </Paper>
+              </Grid>
+              <Grid item xs={12} lg={12} md={12}>
+                <Main saveHistory={saveHistory}/>
+              </Grid>
+            </Grid>
         </Container>
       </main>
     </div>
